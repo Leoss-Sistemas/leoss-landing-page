@@ -50,13 +50,21 @@
   });
 
   function php_email_form_submit(thisForm, action, formData) {
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      company: formData.get('company'),
+      phone: formData.get('phone'),
+      message: formData.get('message'),
+    };
+
     fetch(action, {
       method: 'POST',
-      body: formData,
-      headers: {'X-Requested-With': 'XMLHttpRequest'}
+      body: JSON.stringify(data)
     })
     .then(response => {
-      if( response.ok ) {
+      console.log('response', response)
+      if (response.ok) {
         return response.text();
       } else {
         throw new Error(`${response.status} ${response.statusText} ${response.url}`); 
@@ -64,7 +72,7 @@
     })
     .then(data => {
       thisForm.querySelector('.loading').classList.remove('d-block');
-      if (data.trim() == 'OK') {
+      if (data.trim() === '{"success":true}') {
         thisForm.querySelector('.sent-message').classList.add('d-block');
         thisForm.reset(); 
       } else {
@@ -72,6 +80,7 @@
       }
     })
     .catch((error) => {
+      console.log('error', error)
       displayError(thisForm, error);
     });
   }
